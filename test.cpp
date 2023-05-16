@@ -82,7 +82,7 @@ class GPIO
         int  Set_Value(string value);
         int  Get_Value();
         int Set_Direction(string Direction);
-        // Get_Direction();
+        //Get_Direction();
 
         
 
@@ -100,7 +100,10 @@ GPIO::GPIO(string GPIO_Number)
    // export
 
    cout << "The Producer of this Progrma is OH SUN CHUL " << endl; 
-   cout << "Let's Constructiong gpio" << GPIO_Number << endl; 
+   cout << "E-Mail : ispo3695@naver.com" << endl;
+   cout << "H.P : 010 - 2736 - 3791" << endl; 
+
+   cout << "~♬♬♬ Let's Constructing GPIO " << GPIO_Number << "♬♬♬~" << endl; 
 
    int fd;
    GPIO_Directory = Common_Path + "gpio" + GPIO_Number +"/"; 
@@ -206,14 +209,14 @@ int GPIO::Set_Direction(string Direction)
 int GPIO::Set_Value(string value)
 {
      
-     int fd; 
+   
      Value_File = GPIO_Directory + "value";
     
 
      if( value == "0" || value == "1")
      {
            
-         fd = open(Value_File.c_str(),O_RDWR | O_CLOEXEC);
+         int fd = open(Value_File.c_str(),O_RDWR | O_CLOEXEC);
          if( fd == -1) 
          {
 
@@ -224,6 +227,23 @@ int GPIO::Set_Value(string value)
          else
          {
 
+            cout << "Succeed to Open File " <<  Value_File << "...!!!" <<endl; 
+            int status = write(fd,value.c_str(),value.length());
+            if(status == -1 )
+            {
+
+               cout << "Error to Write [ " << value << " ] " << " on [ " << Value_File << " ] " << endl; 
+               return -1;  
+
+
+            }
+            else
+            {
+                cout << "Succeed to Write [ " << value << " ] " << " on [ " << Value_File << " ] " << endl; 
+                close(fd); 
+                return 1;
+
+            }
 
 
          }
@@ -233,6 +253,8 @@ int GPIO::Set_Value(string value)
      else
      {
 
+         cout << "Error to Set GPIO Value" << endl;
+         cout << "Value has to be either 1(HIGH) either 0(LOW)" << endl; 
 
 
 
@@ -254,6 +276,8 @@ int main( int argc, char* argv[])
    cout << "Author : OH SUN CHUL" << endl;
    cout << "E-mail : ispo3695@google.com" << endl;
    cout << "E-mail : ispo3695@naver.com" << endl; 
+
+   
    
    
     GPIO gpio = GPIO(argv[1]); 
