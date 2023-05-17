@@ -72,6 +72,7 @@ class GPIO
   string GPIO_Directory; 
   string Direction_File;
   string Value_File;
+  string GPIO_Num; 
   
   //method 
   public :
@@ -82,6 +83,7 @@ class GPIO
         int  Set_Value(string value);
         int  Get_Value();
         int Set_Direction(string Direction);
+        int Get_GPIONum(); 
         //Get_Direction();
 
         
@@ -103,18 +105,20 @@ GPIO::GPIO(string GPIO_Number)
    cout << "E-Mail : ispo3695@naver.com" << endl;
    cout << "H.P : 010 - 2736 - 3791" << endl; 
 
-   cout << "~♬♬♬ Let's Constructing GPIO " << GPIO_Number << "♬♬♬~" << endl; 
+   cout << "~♬♬♬ Let's Constructing GPIO" << GPIO_Number << " ♬♬♬~" << endl; 
 
-   int fd;
+   
    GPIO_Directory = Common_Path + "gpio" + GPIO_Number +"/"; 
+      
+   this->GPIO_Num = GPIO_Number;
   
 
-   fd = open(Export_File.c_str(),O_WRONLY | O_CLOEXEC );
+   int fd = open(Export_File.c_str(),O_WRONLY | O_CLOEXEC );
 
    if( fd == -1 ) 
    {
 
-    cout << "Error to Open a File" << Export_File << "...!!!" << endl; 
+    cout << "Error to Open a File [  " << Export_File << " ] " << endl; 
 
 
    }  
@@ -122,13 +126,13 @@ GPIO::GPIO(string GPIO_Number)
    {
      
      int status; 
-     cout << "Succeed to Open File : " << Export_File << "...!!!" << endl; 
+     cout << "Succeed to Open File [ " << Export_File << " ] " << endl; 
      status = write(fd,GPIO_Number.c_str(),GPIO_Number.length());
 
      if(status == -1 ) 
      {
 
-      cout << "Error to Write " << GPIO_Number << " on File " << Export_File << endl;
+      cout << "Error to Write [ " << GPIO_Number << " ] on File [ " << Export_File << " ] " << endl;
 
      }
                     
@@ -136,7 +140,7 @@ GPIO::GPIO(string GPIO_Number)
      {
         
      
-        cout << "Succeed to Create " << GPIO_Directory << "...!!!" << endl; 
+        cout << "Succeed to Create [ " << GPIO_Directory << " ] " << endl; 
         close(fd);
              
 
@@ -158,32 +162,32 @@ int GPIO::Set_Direction(string Direction)
             int fd; 
             Direction_File = GPIO_Directory + "direction";
             
-            cout << "You set " << " [ " << Direction << " ] " << " on " << Direction_File << "...!!!" << endl; 
+            cout << "You set " << " [ " << Direction << " ] " << " on [ " << Direction_File << " ] " << endl; 
             
             fd=open(Direction_File.c_str(),O_RDWR | O_CLOEXEC);
 
             if( fd == -1 ) 
             {
 
-               cout << "Error to Open File : " << Direction_File << "...!!!" << endl;
+               cout << "Error to Open File [ " << Direction_File << " ] " << endl;
                return -1; 
             
             }
             else
             {
                int status;
-               cout << "Succeed to Open File : " << Direction_File << "...!!!" << endl;
+               cout << "Succeed to Open File [ " << Direction_File << " ] " << endl;
                status = write(fd,Direction.c_str(),strlen(Direction.c_str())); 
                if(status == -1 ) 
                {
-                  cout << "Error to Write " << Direction << " On File " << Direction_File << "...!!!" << endl; 
+                  cout << "Error to Write [ " << Direction << " ] On File [ " << Direction_File << " ] " << endl; 
                   return -1;
 
                }
                else 
                {
 
-                 cout << "Succeed to Write " << " [ " << Direction << " ] " <<  " On File " << Direction_File << "...!!!" << endl; 
+                 cout << "Succeed to Write [ " << Direction << " ] " <<  " On File [ " << Direction_File << " ] " << endl; 
                  close(fd); 
 
                }
@@ -220,14 +224,14 @@ int GPIO::Set_Value(string value)
          if( fd == -1) 
          {
 
-            cout << "Error to Open File " << Value_File << "...!!!" <<endl;
+            cout << "Error to Open File [ " << Value_File << " ] " <<endl;
             return -1; 
 
          }
          else
          {
 
-            cout << "Succeed to Open File " <<  Value_File << "...!!!" <<endl; 
+            cout << "Succeed to Open File [ " <<  Value_File << " ] " <<endl; 
             int status = write(fd,value.c_str(),value.length());
             if(status == -1 )
             {
@@ -248,7 +252,6 @@ int GPIO::Set_Value(string value)
 
          }
 
-
      }
      else
      {
@@ -262,8 +265,59 @@ int GPIO::Set_Value(string value)
 
 
 }
+int GPIO::Get_Value()
+{
+
+    
+    char value[1024];
+    memset(value,0,sizeof(value)); 
+    Value_File = GPIO_Directory + "value";
+    int fd = open(Value_File.c_str(), O_RDONLY | O_CLOEXEC );
+    if( fd == -1 )
+    {
+
+      cout << "Error to Open File [ " << Value_File << " ] " <<endl;
+      return -1;
 
 
+
+    }
+    else 
+    {
+
+           // cout << "Succeed to Open File " <<  Value_File << "...!!!" <<endl; 
+            int status = read(fd,value,sizeof(value)); 
+            if(status == -1 )
+            {
+
+               cout << "Error to Read [ " << value << " ] " << " on [ " << Value_File << " ] " << endl; 
+               return -1;  
+
+
+            }
+            else
+            {
+               // cout << "Succeed to Read [ " << value << " ] " << " on [ " << Value_File << " ] " << endl; 
+                close(fd); 
+                return atoi(value); 
+
+            }
+
+
+      }
+
+    
+}
+
+
+int GPIO::Get_GPIONum()
+{
+
+        
+        return stoi(this->GPIO_Num); 
+
+   
+}
 
 
 
@@ -283,6 +337,9 @@ int main( int argc, char* argv[])
     GPIO gpio = GPIO(argv[1]); 
     gpio.Set_Direction(argv[2]);
     gpio.Set_Value(argv[3]); 
+    cout << "Constructed GPIO Number : " << gpio.Get_GPIONum() << endl; 
+    cout << "Constructd GPIO Value :   " << gpio.Get_Value() << endl; 
+
 
     
 
